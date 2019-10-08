@@ -14,7 +14,7 @@ jobs:
   pool:
     vmImage: 'Ubuntu 16.04'
   steps:
-  - task: DotNetCoreInstaller@0
+  - task: DotNetCoreInstaller@2
     inputs:
       packageType: 'sdk'
       version: $(netCoreSdkVersion)
@@ -29,24 +29,11 @@ jobs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx' 
 
-- job: macOS
-  pool:
-    vmImage: 'macOS-10.13'
-  steps:
-  - task: DotNetCoreInstaller@0
+  - task: PublishBuildArtifacts@1
     inputs:
-      packageType: 'sdk'
-      version: $(netCoreSdkVersion)
-  - script: dotnet build ./SimplCommerce.sln
-    displayName: 'dotnet build'
-  - script: ./run-tests.sh
-    displayName: 'run tests'
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results **/*.trx'
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: VSTest
-      testResultsFiles: '**/*.trx' 
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop-Linux'
+      publishLocation: 'Container'
 
 - job: Windows
   pool:
@@ -68,6 +55,11 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx' 
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop-Windows'
+      publishLocation: 'Container'
 
 - job: LinuxRelease
   pool:
@@ -89,3 +81,9 @@ jobs:
     inputs:
       testResultsFormat: VSTest
       testResultsFiles: '**/*.trx' 
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop-LinuxRelease'
+      publishLocation: 'Container'
+
